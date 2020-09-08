@@ -30,18 +30,28 @@ public class MyCommand {
         return ISuggestionProvider.suggest(booleans.stream(), builder);
     };
 
+    private static final SuggestionProvider<CommandSource> SUGGEST_COMMAND_NAMES = (source, builder) -> {
+        ArrayList<String> booleans = new ArrayList<>();
+        booleans.add("info");
+        booleans.add("plantSapling");
+        booleans.add("decayLeaves");
+        booleans.add("reverseShift");
+        booleans.add("disableShift");
+        return ISuggestionProvider.suggest(booleans.stream(), builder);
+    };
+
     public static void registerInfo(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(Commands.literal("tch").executes(source -> {
-            return hello(source.getSource(), source.getSource().asPlayer());
+            return info(source.getSource());
         }).then(Commands.argument("info", EntityArgument.player()).executes(source -> {
-            return hello(source.getSource(), EntityArgument.getPlayer(source, "target"));
+            return info(source.getSource());
         })));
     }
 
     public static void registerPlantSapling(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(Commands.literal("tch").executes(source -> {
             return hello(source.getSource(), source.getSource().asPlayer());
-        }).then(Commands.argument("plantSapling", EntityArgument.player()).executes(source -> {
+        }).then(Commands.argument("plantSapling", StringArgumentType.string()).executes(source -> {
             return hello(source.getSource(), EntityArgument.getPlayer(source, "target"));
         }).then(Commands.argument("toggle", BoolArgumentType.bool()).suggests(SUGGEST_BOOLEANS).executes(source -> {
             return hello(source.getSource(), EntityArgument.getPlayer(source, "target"), StringArgumentType.getString(source, "toggle"));
@@ -51,7 +61,7 @@ public class MyCommand {
     public static void registerDecayLeaves(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(Commands.literal("tch").executes(source -> {
             return hello(source.getSource(), source.getSource().asPlayer());
-        }).then(Commands.argument("decayLeaves", EntityArgument.player()).executes(source -> {
+        }).then(Commands.argument("decayLeaves", StringArgumentType.string()).suggests(SUGGEST_COMMAND_NAMES).executes(source -> {
             return hello(source.getSource(), EntityArgument.getPlayer(source, "target"));
         }).then(Commands.argument("toggle", BoolArgumentType.bool()).suggests(SUGGEST_BOOLEANS).executes(source -> {
             return hello(source.getSource(), EntityArgument.getPlayer(source, "target"), StringArgumentType.getString(source, "toggle"));
@@ -61,7 +71,7 @@ public class MyCommand {
     public static void registerReverseShift(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(Commands.literal("tch").executes(source -> {
             return hello(source.getSource(), source.getSource().asPlayer());
-        }).then(Commands.argument("reverseShift", EntityArgument.player()).executes(source -> {
+        }).then(Commands.argument("reverseShift", StringArgumentType.string()).executes(source -> {
             return hello(source.getSource(), EntityArgument.getPlayer(source, "target"));
         }).then(Commands.argument("toggle", BoolArgumentType.bool()).suggests(SUGGEST_BOOLEANS).executes(source -> {
             return hello(source.getSource(), EntityArgument.getPlayer(source, "target"), StringArgumentType.getString(source, "toggle"));
@@ -71,7 +81,7 @@ public class MyCommand {
     public static void registerDisableShift(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(Commands.literal("tch").executes(source -> {
             return hello(source.getSource(), source.getSource().asPlayer());
-        }).then(Commands.argument("disableShift", EntityArgument.player()).executes(source -> {
+        }).then(Commands.argument("disableShift", StringArgumentType.string()).executes(source -> {
             return hello(source.getSource(), EntityArgument.getPlayer(source, "target"));
         }).then(Commands.argument("toggle", BoolArgumentType.bool()).suggests(SUGGEST_BOOLEANS).executes(source -> {
             return hello(source.getSource(), EntityArgument.getPlayer(source, "target"), StringArgumentType.getString(source, "toggle"));
@@ -83,13 +93,17 @@ public class MyCommand {
         return 1;
     }
 
+    private static int info(CommandSource source){
+        source.sendFeedback(new TranslationTextComponent("command.infoInfo"), true);
+        return 1;
+    }
+
     private static int hello(CommandSource source, PlayerEntity player, String toggle) throws CommandSyntaxException {
-		if(TextFormatting.getValueByName(color) == null) {
-            boolean parsedBoolean = Boolean.parseBoolean(toggle); //Add some error handling
-		}
-        TreeChopper.LOGGER.info("Color: " + color);
-        TreeChopper.LOGGER.info("Color value: " + TextFormatting.getValueByName(color));
-		source.sendFeedback(new TranslationTextComponent("command.hello.color", player.getDisplayName()).mergeStyle(TextFormatting.getValueByName(color)), true);
+		boolean parsedToggle = Boolean.parseBoolean(toggle);
+
+        TreeChopper.LOGGER.info("Choice: " + toggle);
+        TreeChopper.LOGGER.info("Parse Choice: " + parsedToggle);
+		source.sendFeedback(new TranslationTextComponent("command.hello.color", player.getDisplayName()).mergeStyle(TextFormatting.GREEN), true);
 		return 1;
 	}
 }
