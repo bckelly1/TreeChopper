@@ -5,10 +5,13 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.util.text.TranslationTextComponent;
+import treechopper.common.config.Configuration;
 
 public class DisableShiftCommand {
+    private static final String COMMAND_NAME = "disable_shift";
+
     public static ArgumentBuilder<CommandSource, ?> register() {
-        return Commands.literal("disable_shift")
+        return Commands.literal(COMMAND_NAME)
                 .then(
                         Commands.argument("toggle", BoolArgumentType.bool())
                                 .executes(source ->
@@ -18,7 +21,8 @@ public class DisableShiftCommand {
     }
 
     private static int execute(CommandSource source, boolean choice){
-        source.sendFeedback(new TranslationTextComponent("command.choice", "disable_shift", choice), true);
+        Configuration.common.disableShift.set(choice);
+        source.sendFeedback(new TranslationTextComponent("command.choice", COMMAND_NAME, choice), true);
         return 1;
     }
 }

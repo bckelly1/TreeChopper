@@ -11,9 +11,11 @@ import net.minecraft.util.text.TranslationTextComponent;
 import java.util.ArrayList;
 
 public class TreeChopperCommand {
+    private static final String COMMAND_NAME = "tch";
+
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(
-                Commands.literal("tch")
+                Commands.literal(COMMAND_NAME)
                     .then(DecayLeavesCommand.register())
                     .then(DisableShiftCommand.register())
                     .then(InfoCommand.register())
