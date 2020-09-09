@@ -12,7 +12,7 @@ import treechopper.common.config.Configuration;
 
 public class ReverseShiftCommand {
     private static final String COMMAND_NAME = "reverse_shift";
-    private static final String COMMAND_SWITCH_KEY = "command.decayLeavesSwitch";
+    private static final String COMMAND_SWITCH_KEY = "command.decay_leaves_switch";
 
     public static ArgumentBuilder<CommandSource, ?> register() {
         return Commands.literal(COMMAND_NAME)

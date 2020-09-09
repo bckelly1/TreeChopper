@@ -12,7 +12,7 @@ import treechopper.common.config.Configuration;
 
 public class DisableShiftCommand {
     private static final String COMMAND_NAME = "disable_shift";
-    private static final String COMMAND_SWITCH_KEY = "command.disableShiftSwitch";
+    private static final String COMMAND_SWITCH_KEY = "command.disable_shift_switch";
 
     public static ArgumentBuilder<CommandSource, ?> register() {
         return Commands.literal(COMMAND_NAME)

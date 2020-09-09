@@ -12,7 +12,7 @@ import treechopper.common.config.Configuration;
 
 public class PlantSaplingCommand {
     private static final String COMMAND_NAME = "plant_sapling";
-    private static final String COMMAND_SWITCH_KEY = "command.plantSaplingSwitch";
+    private static final String COMMAND_SWITCH_KEY = "command.plant_sapling_switch";
 
     public static ArgumentBuilder<CommandSource, ?> register() {
         return Commands.literal(COMMAND_NAME)

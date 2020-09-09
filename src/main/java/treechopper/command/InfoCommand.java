@@ -6,7 +6,7 @@ import net.minecraft.command.Commands;
 import net.minecraft.util.text.TranslationTextComponent;
 
 public class InfoCommand {
-    private static final String COMMAND_NAME = "plant_sapling";
+    private static final String COMMAND_NAME = "info";
 
     public static ArgumentBuilder<CommandSource, ?> register() {
         return Commands.literal(COMMAND_NAME)
@@ -16,7 +16,7 @@ public class InfoCommand {
     }
 
     private static int execute(CommandSource source){
-        source.sendFeedback(new TranslationTextComponent("command.infoInfo", COMMAND_NAME), true);
+        source.sendFeedback(new TranslationTextComponent("command.info", COMMAND_NAME), true);
         return 1;
     }
 }
