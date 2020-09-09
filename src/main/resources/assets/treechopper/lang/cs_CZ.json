@@ -2,7 +2,7 @@
   "proxy.printBlock": "Blok:",
   "proxy.printMainHand": "V ruce:",
 
-  "command.errorMessage": "Napište \"/tch help\" pro více informací",
+  "command.errorMessage": "Napište \"/tch info\" pro více informací",
   "command.decayLeavesSwitch": "Změna padání listí na",
   "command.plantSaplingSwitch": "Změna automatického sázení stromku na",
   "command.reverseShiftSwitch": "Změna obrácené funkce SHIFTu na",

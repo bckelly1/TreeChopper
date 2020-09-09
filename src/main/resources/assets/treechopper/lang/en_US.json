@@ -2,12 +2,12 @@
     "proxy.printBlock": "Block:",
     "proxy.printMainHand": "Main hand item:",
 
-    "command.errorMessage": "Type \"/tch help\" for help",
+    "command.errorMessage": "Type \"/tch info\" for usage information",
 
-    "command.decayLeavesSwitch": "Decay leaves has been switched",
-    "command.plantSaplingSwitch": "Auto planting has been switched",
-    "command.reverseShiftSwitch": "Reverse function has been switched",
-    "command.disableShiftSwitch": "Disable shift function has been switched",
+    "command.decayLeavesSwitch": "Decay leaves has been switched to %s",
+    "command.plantSaplingSwitch": "Auto planting has been switched to %s",
+    "command.reverseShiftSwitch": "Reverse function has been switched to %s",
+    "command.disableShiftSwitch": "Disable shift function has been switched to %s",
 
     "command.permissions": "You do not have permission to use this command",
 

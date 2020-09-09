@@ -2,7 +2,7 @@
   "proxy.printBlock": "Bloco:",
   "proxy.printMainHand": "Item da mão principal:",
 
-  "command.errorMessage": "Digite \"/tch help\" para ajuda",
+  "command.errorMessage": "Digite \"/tch info\" para ajuda",
   "command.decayLeavesSwitch": "Decaimento de folhas foi trocado",
   "command.plantSaplingSwitch": "Plantio automático foi trocado",
   "command.reverseShiftSwitch": "Reverter função foi trocada",
