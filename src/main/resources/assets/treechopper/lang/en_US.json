@@ -11,6 +11,7 @@
 
     "command.permissions": "You do not have permission to use this command",
 
+    "command.choice": "TCH Command: %s, toggle: %s",
     "command.infoInfo": " Print info about server settings",
     "command.plantSaplingInfo": " Auto plant sapling, around his trunk",
     "command.decayLeavesInfo": " Decay leaves with tree fall",

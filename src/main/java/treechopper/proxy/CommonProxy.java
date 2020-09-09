@@ -11,7 +11,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import treechopper.command.MyCommand;
+import treechopper.command.*;
 import treechopper.common.config.Configuration;
 import treechopper.common.handler.TreeHandler;
 import treechopper.core.TreeChopper;
@@ -41,11 +41,7 @@ public class CommonProxy {
 
   @SubscribeEvent
   public static void onServerStarting(final RegisterCommandsEvent event) {
-    MyCommand.registerInfo(event.getDispatcher());
-    MyCommand.registerDecayLeaves(event.getDispatcher());
-    MyCommand.registerDisableShift(event.getDispatcher());
-    MyCommand.registerPlantSapling(event.getDispatcher());
-    MyCommand.registerReverseShift(event.getDispatcher());
+    TreeChopperCommand.register(event.getDispatcher());
   }
 
   @SubscribeEvent
