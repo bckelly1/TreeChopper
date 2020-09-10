@@ -10,10 +10,19 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import treechopper.common.config.Configuration;
 
+/**
+ * Disable Shift toggle command.
+ * When enabled, pressing the shift key will not do anything. When disabled, the shift key will
+ * change how the mod does or does not chop trees.
+ */
 public class DisableShiftCommand {
     private static final String COMMAND_NAME = "disable_shift";
     private static final String COMMAND_SWITCH_KEY = "command.disable_shift_switch";
 
+    /**
+     * Registers the command to the dispatcher tree's command configuration
+     * @return ArgumentBuilder: Attaches the command to the parent "/tch" command
+     */
     public static ArgumentBuilder<CommandSource, ?> register() {
         return Commands.literal(COMMAND_NAME)
                 .then(
@@ -24,6 +33,14 @@ public class DisableShiftCommand {
                 );
     }
 
+    /**
+     * What the Disable Shift command actually does.
+     *
+     * Change the mod configuration on the server and client, let all players know the mod config changed.
+     * @param source CommandSource: Event's command source
+     * @param choice boolean: Toggle (true/false) turns on or off the mod configuration
+     * @return int: Anything >= 0 is considered a successful run of the command
+     */
     private static int execute(CommandSource source, boolean choice){
         Configuration.common.disableShift.set(choice);
 
