@@ -1,9 +1,11 @@
 package treechopper.command;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 /**
  * Print information on how the "/tch" family of commands is used
@@ -29,7 +31,13 @@ public class InfoCommand {
      * @return int: Anything >= 0 is considered a successful run of the command
      */
     private static int execute(CommandSource source){
-        source.sendFeedback(new TranslationTextComponent("command.info", COMMAND_NAME), true);
+        if (source.hasPermissionLevel(1)) {
+            source.sendFeedback(new TranslationTextComponent("command.info", COMMAND_NAME), true);
+        }
+        else{ // Permission denied
+            source.sendFeedback(new TranslationTextComponent("command.permissions", COMMAND_NAME), true);
+        }
+
         return 1;
     }
 }

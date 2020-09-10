@@ -42,12 +42,17 @@ public class DisableShiftCommand {
      * @return int: Anything >= 0 is considered a successful run of the command
      */
     private static int execute(CommandSource source, boolean choice){
-        Configuration.common.disableShift.set(choice);
+        if (source.hasPermissionLevel(1)) {
+            Configuration.common.disableShift.set(choice);
 
-        for(ServerPlayerEntity playerEntity : source.getServer().getPlayerList().getPlayers()) {
-            playerEntity.sendMessage(new TranslationTextComponent(COMMAND_SWITCH_KEY, choice).mergeStyle(TextFormatting.ITALIC, TextFormatting.GRAY), Util.DUMMY_UUID);
+            for(ServerPlayerEntity playerEntity : source.getServer().getPlayerList().getPlayers()) {
+                playerEntity.sendMessage(new TranslationTextComponent(COMMAND_SWITCH_KEY, choice).mergeStyle(TextFormatting.ITALIC, TextFormatting.GRAY), Util.DUMMY_UUID);
+            }
+            source.sendFeedback(new TranslationTextComponent("command.choice", COMMAND_NAME, choice), true);
         }
-        source.sendFeedback(new TranslationTextComponent("command.choice", COMMAND_NAME, choice), true);
+        else {
+            source.sendFeedback(new TranslationTextComponent("command.permissions", COMMAND_NAME, choice), true);
+        }
         return 1;
     }
 }

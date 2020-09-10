@@ -41,14 +41,19 @@ public class PlantSaplingCommand {
      * @return int: Anything >= 0 is considered a successful run of the command
      */
     private static int execute(CommandSource source, boolean choice){
-        Configuration.common.plantSapling.set(choice);
+        if (source.hasPermissionLevel(1)) {
+            Configuration.common.plantSapling.set(choice);
 
-        // There may be a way to more efficiently broadcast a message to all players but I didn't see one
-        // in the documentation or source code.
-        for(ServerPlayerEntity playerEntity : source.getServer().getPlayerList().getPlayers()) {
-            playerEntity.sendMessage(new TranslationTextComponent(COMMAND_SWITCH_KEY, choice).mergeStyle(TextFormatting.ITALIC, TextFormatting.GRAY), Util.DUMMY_UUID);
+            // There may be a way to more efficiently broadcast a message to all players but I didn't see one
+            // in the documentation or source code.
+            for(ServerPlayerEntity playerEntity : source.getServer().getPlayerList().getPlayers()) {
+                playerEntity.sendMessage(new TranslationTextComponent(COMMAND_SWITCH_KEY, choice).mergeStyle(TextFormatting.ITALIC, TextFormatting.GRAY), Util.DUMMY_UUID);
+            }
+            source.sendFeedback(new TranslationTextComponent("command.choice", COMMAND_NAME, choice), true);
         }
-        source.sendFeedback(new TranslationTextComponent("command.choice", COMMAND_NAME, choice), true);
+        else{
+            source.sendFeedback(new TranslationTextComponent("command.permissions", COMMAND_NAME, choice), true);
+        }
         return 1;
     }
 }
