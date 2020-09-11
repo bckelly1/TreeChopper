@@ -13,6 +13,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import treechopper.command.*;
+import treechopper.common.PlayerInteract;
 import treechopper.common.config.Configuration;
 import treechopper.common.handler.TreeHandler;
 import treechopper.core.TreeChopper;
@@ -20,19 +21,6 @@ import treechopper.core.TreeChopper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-class PlayerInteract {
-
-  public BlockPos blockPos; // Interact block position
-  public float logCount;
-  public int axeDurability;
-
-  public PlayerInteract(BlockPos blockPos, float logCount, int axeDurability) {
-    this.blockPos = blockPos;
-    this.logCount = logCount;
-    this.axeDurability = axeDurability;
-  }
-}
 
 /**
  * Handles all event bus listeners.  Client side only.
