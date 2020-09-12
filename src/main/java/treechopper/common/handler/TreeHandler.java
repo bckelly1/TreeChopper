@@ -131,29 +131,25 @@ public class TreeHandler {
    *   Decay leaves if enabled, sets all leaf blocks to air
    *
    * @param world Minecraft world
-   * @param entityPlayer Player who broke the tree
+   * @param tree Tree to be broken
    */
-  public void destroyTree(World world, PlayerEntity entityPlayer) {
-    if (treeMap.containsKey(entityPlayer.getUniqueID())) {
-      Tree tmpTree = treeMap.get(entityPlayer.getUniqueID());
-
-      for (BlockPos logPos : tmpTree.getLogs()) {
+  public void destroyTree(World world, Tree tree) {
+      for (BlockPos logPos : tree.getLogs()) {
         world.destroyBlock(logPos, true);
         world.setBlockState(logPos, Blocks.AIR.getDefaultState());
       }
 
-      if (Configuration.common.plantSapling.get() && !tmpTree.getLeaves().isEmpty()) {
-        BlockPos tmpPosition = tmpTree.getLeaves().get(tmpTree.getLeavesCount() - 1);
-        plantSapling(world, tmpPosition, tmpTree.getInitialBlockPosition());
+      if (Configuration.common.plantSapling.get() && !tree.getLeaves().isEmpty()) {
+        BlockPos tmpPosition = tree.getLeaves().get(tree.getLeavesCount() - 1);
+        plantSapling(world, tmpPosition, tree.getInitialBlockPosition());
       }
 
       if (Configuration.common.decayLeaves.get()) {
-        for (BlockPos leafPos : tmpTree.getLeaves()) {
+        for (BlockPos leafPos : tree.getLeaves()) {
           world.destroyBlock(leafPos, true);
           world.setBlockState(leafPos, Blocks.AIR.getDefaultState());
         }
       }
-    }
   }
 
   /**

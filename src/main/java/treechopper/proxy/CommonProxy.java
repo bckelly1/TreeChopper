@@ -110,18 +110,7 @@ public class CommonProxy {
    */
   @SubscribeEvent
   public static void destroyWoodBlock(BlockEvent.BreakEvent breakEvent) {
-    if (playerData.containsKey(breakEvent.getPlayer().getUniqueID())) {
-      BlockPos blockPos = playerData.get(breakEvent.getPlayer().getUniqueID()).blockPos;
 
-      if (blockPos.equals(breakEvent.getPos())) {
-        treeHandler.destroyTree((World) breakEvent.getWorld(), breakEvent.getPlayer());
-
-        if (!breakEvent.getPlayer().isCreative() && breakEvent.getPlayer().getHeldItemMainhand().isDamageable()) {
-          int axeDurability = breakEvent.getPlayer().getHeldItemMainhand().getDamage() + (int) (playerData.get(breakEvent.getPlayer().getUniqueID()).logCount * 1.5);
-          breakEvent.getPlayer().getHeldItemMainhand().setDamage(axeDurability);
-        }
-      }
-    }
   }
 
   // Check if the block at @blockPos is an instance of LOGS
