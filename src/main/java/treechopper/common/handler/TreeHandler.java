@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.event.world.BlockEvent;
 import treechopper.common.config.Configuration;
 import treechopper.common.tree.Tree;
 
@@ -122,6 +123,17 @@ public class TreeHandler {
     tree.insertLog(blockPos);
 
     return true;
+  }
+
+  public void destroyTreeCommonEvent(BlockEvent.BreakEvent breakEvent) {
+    BlockPos blockPos = breakEvent.getPos();
+    Tree tree = analyzeTree((World) breakEvent.getWorld(), blockPos, breakEvent.getPlayer());
+    destroyTree((World) breakEvent.getWorld(), tree);
+
+    if (!breakEvent.getPlayer().isCreative() && breakEvent.getPlayer().getHeldItemMainhand().isDamageable()) {
+      int axeDurability = breakEvent.getPlayer().getHeldItemMainhand().getDamage() + (int)(tree.getLogCount() * 1.5);
+      breakEvent.getPlayer().getHeldItemMainhand().setDamage(axeDurability);
+    }
   }
 
   /**

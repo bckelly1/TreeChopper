@@ -16,6 +16,7 @@ import treechopper.command.*;
 import treechopper.common.PlayerInteract;
 import treechopper.common.config.Configuration;
 import treechopper.common.handler.TreeHandler;
+import treechopper.common.tree.Tree;
 import treechopper.core.TreeChopper;
 
 import java.util.HashMap;
@@ -110,7 +111,7 @@ public class CommonProxy {
    */
   @SubscribeEvent
   public static void destroyWoodBlock(BlockEvent.BreakEvent breakEvent) {
-
+    treeHandler.destroyTreeCommonEvent(breakEvent);
   }
 
   // Check if the block at @blockPos is an instance of LOGS
