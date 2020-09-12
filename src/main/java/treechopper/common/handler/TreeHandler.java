@@ -125,6 +125,13 @@ public class TreeHandler {
     return true;
   }
 
+  /**
+   * Destroy tree has the same logic for client and server but it has to be registered on both. If it is only
+   *   registered on one, it won't work when used in the other.
+   * I don't actually know why that is, I thought single player used a virtual server for its back end.
+   *
+   * @param breakEvent Event that triggers the destroy tree event.
+   */
   public void destroyTreeCommonEvent(BlockEvent.BreakEvent breakEvent) {
     BlockPos blockPos = breakEvent.getPos();
     Tree tree = analyzeTree((World) breakEvent.getWorld(), blockPos, breakEvent.getPlayer());
