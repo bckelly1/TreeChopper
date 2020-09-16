@@ -1,10 +1,6 @@
 package treechopper.proxy;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.AxeItem;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -13,23 +9,15 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import treechopper.command.*;
-import treechopper.common.PlayerInteract;
-import treechopper.common.config.Configuration;
 import treechopper.common.handler.TreeHandler;
 import treechopper.common.tree.Tree;
 import treechopper.core.TreeChopper;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Handles all event bus listeners.  Client side only.
  */
 @Mod.EventBusSubscriber(modid = TreeChopper.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class CommonProxy {
-
-  private static Map<UUID, PlayerInteract> playerData = new HashMap<>();
   private static TreeHandler treeHandler = new TreeHandler();
 
   /**
@@ -50,41 +38,8 @@ public class CommonProxy {
    */
   @SubscribeEvent
   public static void interactWithTree(PlayerInteractEvent.LeftClickBlock interactEvent) {
-    int logCount;
-    boolean shifting = true;
-
-    if (!Configuration.common.disableShift.get()) {
-      if (interactEvent.getPlayer().isSneaking() && !Configuration.common.reverseShift.get()) {
-        shifting = false;
-      }
-
-      if (!interactEvent.getPlayer().isSneaking() && Configuration.common.reverseShift.get()) {
-        shifting = false;
-      }
-    }
-
-    if (checkWoodenBlock(interactEvent.getWorld(), interactEvent.getPos()) && checkItemInHand(interactEvent.getPlayer()) && shifting) {
-      int axeDurability = interactEvent.getPlayer().getHeldItemMainhand().getMaxDamage() - interactEvent.getPlayer().getHeldItemMainhand().getDamage();
-
-      if (playerData.containsKey(interactEvent.getPlayer().getUniqueID()) &&
-              playerData.get(interactEvent.getPlayer().getUniqueID()).blockPos.equals(interactEvent.getPos()) &&
-              playerData.get(interactEvent.getPlayer().getUniqueID()).axeDurability == axeDurability) {
-        return;
-      }
-
-      logCount = CommonProxy.treeHandler.analyzeTree(interactEvent.getWorld(), interactEvent.getPos(), interactEvent.getPlayer()).getLogCount();
-
-      if (interactEvent.getPlayer().getHeldItemMainhand().isDamageable() && axeDurability < logCount) {
-        playerData.remove(interactEvent.getPlayer().getUniqueID());
-        return;
-      }
-
-      if (logCount > 1) {
-        playerData.put(interactEvent.getPlayer().getUniqueID(), new PlayerInteract(interactEvent.getPos(), logCount, axeDurability));
-      }
-    } else {
-      playerData.remove(interactEvent.getPlayer().getUniqueID());
-    }
+    // Add the tree to the analyzed tree map
+    treeHandler.analyzeTree(interactEvent.getWorld(), interactEvent.getPos(), interactEvent.getPlayer());
   }
 
   /**
@@ -94,14 +49,18 @@ public class CommonProxy {
    */
   @SubscribeEvent
   public static void breakingBlock(PlayerEvent.BreakSpeed breakSpeed) {
-    if (playerData.containsKey(breakSpeed.getPlayer().getUniqueID())) {
-      BlockPos blockPos = playerData.get(breakSpeed.getPlayer().getUniqueID()).blockPos;
-      if (blockPos.equals(breakSpeed.getPos())) {
-        breakSpeed.setNewSpeed(breakSpeed.getOriginalSpeed() / (playerData.get(breakSpeed.getPlayer().getUniqueID()).logCount / 2.0f));
-      } else {
-        breakSpeed.setNewSpeed(breakSpeed.getOriginalSpeed());
-      }
+    // If it's not a valid wood block, don't do anything
+    if (!TreeHandler.checkWoodenBlock(breakSpeed.getPlayer().getEntityWorld(), breakSpeed.getPos())) {
+      return;
     }
+
+    // A check for pressing shift/sneaking
+    if (!treeHandler.shouldDestroyTree(breakSpeed)) {
+      return;
+    }
+
+    Tree tree = treeHandler.analyzeTree(breakSpeed.getPlayer().getEntityWorld(), breakSpeed.getPos(), breakSpeed.getPlayer());
+    breakSpeed.setNewSpeed(breakSpeed.getOriginalSpeed() / (tree.getLogCount() / 2.0f));
   }
 
   /**
@@ -112,21 +71,5 @@ public class CommonProxy {
   @SubscribeEvent
   public static void destroyWoodBlock(BlockEvent.BreakEvent breakEvent) {
     treeHandler.destroyTreeCommonEvent(breakEvent);
-  }
-
-  // Check if the block at @blockPos is an instance of LOGS
-  // This allows any mod that is registering their block with BlockTags.LOGS
-  private static boolean checkWoodenBlock(World world, BlockPos blockPos) {
-    return world.getBlockState(blockPos).getBlock().isIn(BlockTags.LOGS);
-  }
-
-  // Checks if the item being held is an AxeItem
-  // This allows any mod that registers their tool as an AxeItem
-  private static boolean checkItemInHand(PlayerEntity entityPlayer) {
-    if (entityPlayer.getHeldItemMainhand().isEmpty()) {
-      return false;
-    }
-
-    return entityPlayer.getHeldItemMainhand().getItem() instanceof AxeItem;
   }
 }

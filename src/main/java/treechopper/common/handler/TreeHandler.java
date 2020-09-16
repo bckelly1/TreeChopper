@@ -5,10 +5,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.SaplingBlock;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import treechopper.common.config.Configuration;
 import treechopper.common.tree.Tree;
@@ -20,7 +23,7 @@ import java.util.*;
  * is handled within this class.
  */
 public class TreeHandler {
-  private static Map<UUID, Tree> treeMap = new HashMap<>();
+  private static Map<BlockPos, Tree> treeMap = new HashMap<>(); // List of trees that have been touched
   private Tree tree;
 
   /**
@@ -32,6 +35,10 @@ public class TreeHandler {
    * @return Tree
    */
   public Tree analyzeTree(World world, BlockPos treePos, PlayerEntity entityPlayer) {
+    if (treeMap.containsKey(treePos)) { // don't need to re-analyze the tree if we've already analyzed it and it's not broken
+      return treeMap.get(treePos);
+    }
+
     Queue<BlockPos> queuedBlocks = new LinkedList<>();
     Set<BlockPos> tempAdjacentBlocks = new HashSet<>();
     Set<BlockPos> checkedBlocks = new HashSet<>();
@@ -62,7 +69,7 @@ public class TreeHandler {
     }
 
     tree.setInitialBlockPosition(treePos);
-    treeMap.put(entityPlayer.getUniqueID(), tree);
+    treeMap.put(treePos, tree); // Store tree in the list of known trees.
 
     return tree;
   }
@@ -133,9 +140,15 @@ public class TreeHandler {
    * @param breakEvent Event that triggers the destroy tree event.
    */
   public void destroyTreeCommonEvent(BlockEvent.BreakEvent breakEvent) {
+    // Check whether we should destroy the tree or not.
+    if (!shouldDestroyTree(breakEvent)) {
+      return;
+    }
+
     BlockPos blockPos = breakEvent.getPos();
     Tree tree = analyzeTree((World) breakEvent.getWorld(), blockPos, breakEvent.getPlayer());
     destroyTree((World) breakEvent.getWorld(), tree);
+    treeMap.remove(blockPos); // Remove the tree so we don't leak memory
 
     if (!breakEvent.getPlayer().isCreative() && breakEvent.getPlayer().getHeldItemMainhand().isDamageable()) {
       int axeDurability = breakEvent.getPlayer().getHeldItemMainhand().getDamage() + (int)(tree.getLogCount() * 1.5);
@@ -152,7 +165,7 @@ public class TreeHandler {
    * @param world Minecraft world
    * @param tree Tree to be broken
    */
-  public void destroyTree(World world, Tree tree) {
+  private void destroyTree(World world, Tree tree) {
       for (BlockPos logPos : tree.getLogs()) {
         world.destroyBlock(logPos, true);
         world.setBlockState(logPos, Blocks.AIR.getDefaultState());
@@ -208,5 +221,83 @@ public class TreeHandler {
     }
 
     return world.setBlockState(originPos.add(1, 0, 1), SaplingBlock.getBlockFromItem(sapling.getItem()).getDefaultState());
+  }
+
+  /**
+   * For the BreakEvent event, get the necessary information out and pass it to the
+   * decision method.
+   *
+   * @param breakEvent event that triggered the method
+   * @return boolean - should the tree be destroyed or not
+   */
+  private boolean shouldDestroyTree(BlockEvent.BreakEvent breakEvent) {
+    return shouldDestroyTree(breakEvent.getPlayer(), (World) breakEvent.getWorld(), breakEvent.getPos());
+  }
+
+  /**
+   * For the BreakSpeed event, get the necessary information out and pass it to the
+   * decision method.
+   *
+   * @param breakSpeed event that triggered the method
+   * @return boolean - should the tree be destroyed or not
+   */
+  public boolean shouldDestroyTree(PlayerEvent.BreakSpeed breakSpeed) {
+    return shouldDestroyTree(breakSpeed.getPlayer(), breakSpeed.getPlayer().getEntityWorld(), breakSpeed.getPos());
+  }
+
+  /**
+   * Decisions related to destroying the tree or not
+   *
+   * @param playerEntity player who is destroying the tree
+   * @param world world where the tree is located
+   * @param blockPos x,y,z coordinates of where the tree is located
+   * @return boolean - should the tree be destroyed or not
+   */
+  private boolean shouldDestroyTree(PlayerEntity playerEntity, World world, BlockPos blockPos){
+    int logCount;
+    boolean shifting = true;
+
+    if (!Configuration.common.disableShift.get()) {
+      if (playerEntity.isSneaking() && !Configuration.common.reverseShift.get()) {
+        shifting = false;
+      }
+
+      if (!playerEntity.isSneaking() && Configuration.common.reverseShift.get()) {
+        shifting = false;
+      }
+    }
+
+    if (checkWoodenBlock(world, blockPos) && checkItemInHand(playerEntity) && shifting) {
+      int axeDurability = playerEntity.getHeldItemMainhand().getMaxDamage() - playerEntity.getHeldItemMainhand().getDamage();
+
+      logCount = analyzeTree(world, blockPos, playerEntity).getLogCount();
+
+      if (playerEntity.getHeldItemMainhand().isDamageable() && axeDurability < logCount) {
+        return false;
+      }
+
+      if (logCount > 1) {
+        return true;
+      }
+    } else {
+      return false;
+    }
+    return false;
+  }
+
+  // Check if the block at @blockPos is an instance of LOGS
+  // This allows any mod that is registering their block with BlockTags.LOGS
+  public static boolean checkWoodenBlock(World world, BlockPos blockPos) {
+    return world.getBlockState(blockPos).getBlock().isIn(BlockTags.LOGS);
+  }
+
+  // Checks if the item being held is an AxeItem
+  // This allows any mod that registers their tool as an AxeItem
+  private static boolean checkItemInHand(PlayerEntity entityPlayer) {
+    if (entityPlayer.getHeldItemMainhand().isEmpty()) {
+      return false;
+    }
+
+    return entityPlayer.getHeldItemMainhand().getItem() instanceof AxeItem;
   }
 }
